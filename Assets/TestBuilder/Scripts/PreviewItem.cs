@@ -6,6 +6,14 @@ public sealed class PreviewItem : MonoBehaviour
     [SerializeField] private Material _correctMaterial;
     [SerializeField] private Material _wrongMaterial;
     [SerializeField] private Renderer[] renderers;
+    [SerializeField] private LayerMask _layerMask;
+
+    public bool CanPlaced()
+    {
+        var result = !Check();
+        SetMode(result);
+        return result;
+    }
 
     public void SetMode(bool value)
     {
@@ -16,12 +24,12 @@ public sealed class PreviewItem : MonoBehaviour
             renderers[i].material = targetMaterial;
     }
 
-    public bool Check(int layerMask)
+    public bool Check()
     {
         var position = transform.position + _bounds.center;
         var rotation = transform.rotation;
         var size = Vector3.Scale(transform.localScale, _bounds.extents / 2);
-        return Physics.CheckBox(position, size, rotation, layerMask);
+        return Physics.CheckBox(position, size, rotation, _layerMask);
     }
 
     private void OnDrawGizmosSelected()

@@ -9,6 +9,10 @@ public class SimplePlayerController : MonoBehaviour
 
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _bodyTransform;
+    [Space]
+    [SerializeField] private ItemPlacer _placer;
+
+
 
     private float _verticalRotation = 0f;
 
@@ -27,7 +31,7 @@ public class SimplePlayerController : MonoBehaviour
 
         // Расчитываем направление движения относительно направления взгляда игрока
         var moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
-        
+
         _bodyTransform.position += moveDirection * _moveSpeed * Time.deltaTime;
 
         // Поворот персонажа по горизонтали (влево/вправо)
@@ -42,5 +46,15 @@ public class SimplePlayerController : MonoBehaviour
 
         // Предполагается, что основная камера является дочерним объектом игрока
         _cameraTransform.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            _placer.enabled = true;
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+            _placer.enabled = false;
+        if (Input.GetMouseButtonDown(0))
+            _placer.Build();
+
+        var scroll = Input.mouseScrollDelta;
+        _placer.SetScroll(scroll);
     }
 }

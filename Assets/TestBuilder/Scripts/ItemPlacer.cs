@@ -1,44 +1,93 @@
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
+
+using System;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UIElements;
 
 public class ItemPlacer : MonoBehaviour
 {
+    [SerializeField] private ItemData _itemData;
+    [SerializeField] private GameCamera _camera;
     [SerializeField] private float _distance;
-    [SerializeField] private Transform _cameraTransform;
+
     [SerializeField] private GameObject _prefab;
     [SerializeField] private LayerMask _layerMask;
 
-    private GameObject _target;
+    private PreviewItem _previewItem;
+    [SerializeField] private HorizontalRaycastStrategy _strategy;
+    [SerializeField] private DefaultPlaceStrategy _defaultPlaceStrategy;
+    private HorizontalCondition _condition = new();
+    private PlaceStrategy _placeStrategy = new();
+    private bool _correct;
 
-    private void Start()
+    public void SetBlueprint(ItemData item)
     {
-        _target = Instantiate(_prefab);
+        _itemData = item;
+        enabled = true;
+
+    }
+    private void OnEnable()
+    {
+        _previewItem = Instantiate(_itemData.PreviewPrefab);
+    }
+
+    private void OnDisable()
+    {
+        if (_previewItem != null)
+            Destroy(_previewItem.gameObject);
+    }
+
+    public void RemoveBlueprint()
+    {
+        enabled = false;
+        _itemData = null;
+
     }
 
     private void Update()
     {
-        var direction = _cameraTransform.forward;
-        var origin = _cameraTransform.position;
-
-        var ray = new Ray(origin, direction);
-        if (!Physics.Raycast(ray, out var hitInfo, _distance, _layerMask))
+        _correct = false;
+        if (_strategy.Raycast(_camera, out var hit))
         {
-            _target.transform.SetPositionAndRotation(origin + direction * _distance, _cameraTransform.rotation);
+            var place = _placeStrategy.Temp(_camera, hit);
+            _previewItem.transform.SetPositionAndRotation(place.position, place.rotation * _rotation);
+            _correct = _previewItem.CanPlaced() && _condition.Check(hit);
+            _previewItem.SetMode(_correct);
             return;
         }
-        _target.transform.SetPositionAndRotation(hitInfo.point, _cameraTransform.rotation);
+        var defaultPlace = _defaultPlaceStrategy.Temp(_camera);
+        _previewItem.transform.SetPositionAndRotation(defaultPlace.position, defaultPlace.rotation);
+        _previewItem.SetMode(false);
     }
-}
 
-public sealed class GameCamera : MonoBehaviour
-{
-    public Transform Transform;
-    public Vector3 Position;
-    public Vector3 Direction;
-    public Quaternion Rotation;
+    public void Build()
+    {
+        if (_correct && _previewItem != null)
+        {
+            var item = Instantiate(_itemData.ItemPrefab);
+            item.transform.SetPositionAndRotation(_previewItem.transform.position, _previewItem.transform.rotation);
+            Destroy(_previewItem.gameObject);
+            _previewItem = null;
+            enabled = false;
+        }
+    }
+
+    private Quaternion _rotation;
+    private float _angle = 45;
+    [SerializeField] private int _scroll;
+
+    public void SetScroll(Vector2 scroll)
+    {
+        _scroll += (int)scroll.y;
+        _scroll = WrapValue(_scroll, 0, 7);
+        var angle = _angle * _scroll;
+        _rotation = Quaternion.Euler(0, angle, 0);
+    }
+
+    int WrapValue(int value, int min, int max)
+    {
+        int range = max - min + 1; // Диапазон значений, включая границы
+        return (value - min + range) % range + min;
+    }
 }
 
 
@@ -47,7 +96,8 @@ public abstract class RaycastStrategy
     //public abstract void GetPositionAndRotation(GameCamera camera);
 }
 
-public sealed class HorizontalRaycast : RaycastStrategy
+[Serializable]
+public sealed class HorizontalRaycastStrategy : RaycastStrategy
 {
     [SerializeField] private float _forwardDistance;
     [SerializeField] private float _downDistance;
@@ -60,28 +110,42 @@ public sealed class HorizontalRaycast : RaycastStrategy
 
         var forwardRay = new Ray(origin, direction);
 
+        Debug.DrawRay(forwardRay.origin, forwardRay.direction * _forwardDistance);
         if (Physics.Raycast(forwardRay, out hit, _forwardDistance, _layerMask))
             return true;
 
         var downRayPosition = origin + direction * _forwardDistance;
         var downRay = new Ray(downRayPosition, Vector3.down);
 
-        if (Physics.Raycast(forwardRay, out hit, _downDistance, _layerMask))
+        Debug.DrawRay(downRay.origin, downRay.direction * _downDistance);
+        if (Physics.Raycast(downRay, out hit, _downDistance, _layerMask))
             return true;
 
         return false;
     }
 }
 
+public sealed class PlaceStrategy
+{
+    public PositionAndRotation Temp(GameCamera camera, in RaycastHit hit)
+    {
+        var position = hit.point;
+        var rotation = Quaternion.Euler(0, camera.Rotation.eulerAngles.y, 0);
+        return new PositionAndRotation()
+        {
+            position = position,
+            rotation = rotation
+        };
+    }
+}
+
+[Serializable]
 public sealed class DefaultPlaceStrategy
 {
     [SerializeField] private float _distance;
     public PositionAndRotation Temp(GameCamera gameCamera)
     {
         var direction = gameCamera.Direction;
-        direction.y = 0;
-        direction.Normalize();
-
         var rotation = gameCamera.Rotation;
         var itemPosition = gameCamera.Position + direction * _distance;
         var itemRotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
@@ -106,49 +170,18 @@ public sealed class HorizontalCondition
 
     public bool Check(in RaycastHit hit)
     {
-        return Vector3.Dot(_up, hit.normal) == 1;
+        return Vector3.Dot(_up, hit.normal) >= .9;
     }
 }
 
 
 
-public sealed class HorizontalPlaceStrategy
-{
-    private HorizontalRaycast _raycastStrategy;
-    private HorizontalCondition _placeCondition;
-    private DefaultPlaceStrategy _placeStrategy;
-
-    public void Temp(GameCamera gameCamera, PreviewItem item)
-    {
-        if (_raycastStrategy.Raycast(gameCamera, out var hit))
-        {
-            var position = hit.point;
-            var rotation = Quaternion.Euler(0, gameCamera.Rotation.eulerAngles.y, 0);
-
-            if (_placeCondition.Check(hit))
-            {
-                if (item.Check(0))
-                { }
-                // true;
-            }
-            else
-            {
-                // false;
-            }
-        }
-
-        var place = _placeStrategy.Temp(gameCamera);
-    }
-
-
-
-
-}
-
-
-
-public sealed class Item : ScriptableObject
+[CreateAssetMenu(fileName = "ItemBlueprint", menuName = "Custom Create/Item Blueprint")]
+public sealed class ItemData : ScriptableObject
 {
     [SerializeField] private GameObject _itemPrefab;
-    [SerializeField] private GameObject _previewItemPrefab;
+    [SerializeField] private PreviewItem _previewPrefab;
+
+    public GameObject ItemPrefab => _itemPrefab;
+    public PreviewItem PreviewPrefab => _previewPrefab;
 }
