@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Отвечает за размещение объекта по указанному чертежу и отображение его превью.
+/// </summary>
 public class ItemPlacer : MonoBehaviour
 {
     private PreviewItem _currentPreviewItem;

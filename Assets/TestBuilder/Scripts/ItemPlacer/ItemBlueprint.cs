@@ -1,5 +1,10 @@
 using UnityEngine;
 
+
+/// <summary>
+/// Чёртёж объекта.
+/// Представляет сам объект, его превью и то как и куда его можно разместить.
+/// </summary>
 [CreateAssetMenu(fileName = "ItemBlueprint", menuName = "Custom Create/Item Blueprint")]
 public sealed class ItemBlueprint : ScriptableObject
 {
