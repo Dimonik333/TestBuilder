@@ -15,17 +15,22 @@ public sealed class DefaultPlaceStrategy : PlaceStrategy
         {
             var result = _placeOnPointStrategy.TryPlaceOnPoint(hit, out place);
 
-            if (_applyOffsetOnHit)
+            if (!result || _applyOffsetOnHit)
             {
                 var rotation = Quaternion.Euler(0, gameCamera.Rotation.eulerAngles.y, 0) * place.rotation * offset.Rotation;
                 place.rotation = rotation;
             }
 
             itemTransform.SetPositionAndRotation(place.position, place.rotation);
+
+            if (!result)
+                return false;
+
             for (int i = 0; i < _targetConditions.Count; i++)
                 if (!_targetConditions[i].CheckHit(hit))
                     return false;
-            return result;
+
+            return true;
         }
         else
         {

@@ -12,10 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ef61b03d846f3459893278992b0513, type: 3}
   m_Name: DefaultWallPlaceStrategy
   m_EditorClassIdentifier: 
-  _raycastStrategy: {fileID: 0}
-  _placeOnPointStrategy: {fileID: 0}
-  _applyOffsetOnHit: 1
-  _targetConditions: []
+  _raycastStrategy: {fileID: 11400000, guid: 4d5ef6cc63d91574d978ed93f4ef74cd, type: 2}
+  _placeOnPointStrategy: {fileID: 11400000, guid: 63338937608986e49a0e7e817f7d60fd, type: 2}
+  _applyOffsetOnHit: 0
+  _targetConditions:
+  - rid: 7482217595184349285
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 7482217595184349285
+      type: {class: TargetLayerCondition, ns: , asm: Assembly-CSharp}
+      data:
+        _permittedLayers:
+          serializedVersion: 2
+          m_Bits: 256

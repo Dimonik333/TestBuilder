@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   _itemPrefab: {fileID: 5039608984759372994, guid: 3e3a6a39a64d28a4fbb86a7ea17c289e, type: 3}
   _previewPrefab: {fileID: 6993858663433696204, guid: d65913d6f9f4f6349b6b704b5afee0c7, type: 3}
-  _placeStrategy: {fileID: 11400000, guid: 4d1e5e8b711319144b0167c1e04b90bc, type: 2}
+  _placeStrategy: {fileID: 11400000, guid: bd1a33601ede97f4f84381a3f90fb637, type: 2}

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ef61b03d846f3459893278992b0513, type: 3}
   m_Name: DefaultFloorPlaceStrategy
   m_EditorClassIdentifier: 
-  _raycastStrategy: {fileID: 0}
-  _placeOnPointStrategy: {fileID: 0}
+  _raycastStrategy: {fileID: 11400000, guid: 4c492b177d1e94c4b854343ed440ee02, type: 2}
+  _placeOnPointStrategy: {fileID: 11400000, guid: ff46b2cbad3a7f743b89e7f92c9afa63, type: 2}
   _applyOffsetOnHit: 1
   _targetConditions: []
   references:
