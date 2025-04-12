@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9031f83e7595aac4ea5c7cff0dfb9040, type: 3}
+  m_Name: CubeBlueprint
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  _itemPrefab: {fileID: 5039608984759372994, guid: 3e3a6a39a64d28a4fbb86a7ea17c289e, type: 3}
+  _previewPrefab: {fileID: 6993858663433696204, guid: d65913d6f9f4f6349b6b704b5afee0c7, type: 3}
+  _placeStrategy: {fileID: 11400000, guid: 4d1e5e8b711319144b0167c1e04b90bc, type: 2}

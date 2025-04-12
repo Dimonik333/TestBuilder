@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9031f83e7595aac4ea5c7cff0dfb9040, type: 3}
+  m_Name: SphereBlueprint
+  m_EditorClassIdentifier: 
+  _itemPrefab: {fileID: 5039608984759372994, guid: 2e0330e247f412f448d89c6cd387b520, type: 3}
+  _previewPrefab: {fileID: 6993858663433696204, guid: 5ffcb19633eccd44e94a4880b7ba9851, type: 3}
+  _placeStrategy: {fileID: 11400000, guid: e9fa6f00c751386479dcf95e72b0dc83, type: 2}
